@@ -43,7 +43,8 @@ type Booking struct {
 	CardLast4      string `json:"card_last4"`
 	CardExpiration string `json:"card_expiration"`
 	TermsAccepted  bool   `json:"terms_accepted"`
-
+	Status string `json:"status" gorm:"default:confirmed"`
+	
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

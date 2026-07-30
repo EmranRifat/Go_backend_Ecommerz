@@ -11,14 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetBookings returns a paginated list of bookings with all DB columns.
-//
-// Optional query params:
-//   - page           (default 1)
-//   - limit          (default 10, max 100)
-//   - listing_id     (filter by listing uuid)
-//   - q              (search in guest name/email/phone/listing_id)
-//   - payment_method (filter: manual / sslcommerz / ...)
+
 func GetBookings(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
@@ -103,6 +96,49 @@ func GetBookings(db *gorm.DB) fiber.Handler {
 				"hasNext":     page < totalPages,
 				"hasPrevious": page > 1,
 			},
+		})
+	}
+}
+
+
+
+
+
+
+// GetBookingByID retrieves a booking by its ID from the database.	
+
+func GetMyBookings(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		// Get logged-in user ID from JWT middleware
+		userID := c.Locals("sub")
+
+		if userID == nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Unauthorized",
+			})
+		}
+
+		var bookings []models.Booking
+
+		// Find bookings by logged-in user
+		if err := db.
+			Where("booked_by_id = ?", userID).
+			Order("created_at DESC").
+			Find(&bookings).Error; err != nil {
+
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to fetch bookings",
+				"error":   err.Error(),
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "User bookings retrieved successfully",
+			"data":    bookings,
 		})
 	}
 }

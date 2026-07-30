@@ -169,6 +169,8 @@ func CreateBookingDB(db *gorm.DB) fiber.Handler {
 			CardLast4:      in.CardLast4,
 			CardExpiration: in.CardExpiration,
 			TermsAccepted:  in.TermsAccepted,
+		
+			Status: "confirmed",
 		}
 
 		// Save booking

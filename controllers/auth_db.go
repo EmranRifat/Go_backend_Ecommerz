@@ -1,14 +1,17 @@
 package controllers
 
 import (
+	"fmt"
 	"strings"
+
 	// "sync"
-	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"go-fiber-api/models"
 	"go-fiber-api/security"
 	"go-fiber-api/types"
+
+	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 
@@ -63,28 +66,32 @@ func RegisterDB(db *gorm.DB) fiber.Handler {
 			PasswordHash: string(hash),
 			Role:         "user",
 		}
-
+	
+	
 		// 🔥 Insert user
-		if err := db.Create(&u).Error; err != nil {
-
-			// ❌ Duplicate Email
-			if strings.Contains(err.Error(), "duplicate") ||
-				strings.Contains(err.Error(), "unique") {
-				return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+	    result := db.Create(&u)
+			if result.Error != nil {
+				// ❌ Duplicate Email
+				if strings.Contains(result.Error.Error(), "duplicate") ||
+					strings.Contains(result.Error.Error(), "unique") {
+					return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+						"status":      "error",
+						"status_code": fiber.StatusConflict,
+						"message":     "Email already registered",
+						"error":       result.Error.Error(),
+					})
+				}
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"status":      "error",
-					"status_code": fiber.StatusConflict,
-					"message":     "Email already registered",
-					"error":       err.Error(),
+					"status_code": fiber.StatusInternalServerError,
+					"message":     "Failed to register user",
+					"error":       result.Error.Error(),
 				})
 			}
+			fmt.Println("Inserted Rows:", result.RowsAffected)
+			fmt.Println("Created User ID:", u.ID)
 
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":      "error",
-				"status_code": fiber.StatusInternalServerError,
-				"message":     "Failed to register user",
-				"error":       err.Error(),
-			})
-		}
+
 
 		// ✅ Success Response (NO status_code)
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{

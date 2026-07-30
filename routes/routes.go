@@ -57,6 +57,8 @@ func ManageRoutes(app *fiber.App, jwtm *security.JWTManager, db *gorm.DB) {
 	// Protected User APIs
 	// ==========================================================
 	user := api.Group("/", middleware.Protect(jwtm))
+	user.Get("/my-bookings", controllers.GetMyBookings(db))	
+
 
 	user.Get("/me", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -70,6 +72,7 @@ func ManageRoutes(app *fiber.App, jwtm *security.JWTManager, db *gorm.DB) {
 	// ==========================================================
 	// Admin APIs
 	// ==========================================================
+	
 	admin := api.Group("/admin",middleware.Protect(jwtm),middleware.RequireRoles("admin", "superadmin"))
 	admin.Get("/allUsers", dashboard.GetAllUsers(db))
 	admin.Get("/reviews", dashboard.GetAllReviews(db))
