@@ -58,12 +58,12 @@ func main() {
 	app.Use(fiberlogger.New())
 	app.Use(recover.New())
 
-app.Use(cors.New(cors.Config{
-	AllowOrigins: os.Getenv("FRONTEND_URL"),
-    AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-    AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-    AllowCredentials: true,
-}))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: os.Getenv("FRONTEND_URL"),
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+		AllowCredentials: true,
+	}))
 	app.Use("/api", middleware.ActivityLogger(db))
 
 	if err := os.MkdirAll("uploads", 0755); err != nil {
