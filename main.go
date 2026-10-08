@@ -65,7 +65,7 @@ func main() {
 	// 	AllowCredentials: true,
 	// }))
 	app.Use(cors.New(cors.Config{
-    AllowOrigins: "https://homelystay-frontend.vercel.app,http://localhost:3000",
+    AllowOrigins: "https://homely-stay-frontend-8ej2.vercel.app,http://localhost:3000",
     AllowHeaders: "Origin, Content-Type, Accept, Authorization",
     AllowMethods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
     AllowCredentials: true,
